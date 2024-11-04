@@ -25,3 +25,28 @@ A ggplot object representing the CDF inverse plot.
 \description{
 Cumulative Distribution Function (CDF) plot for a biomarker.
 }
+\examples{
+# Load a sample dataset
+  data <- data.frame(
+  biomarker = rnorm(100, mean = 50, sd = 10),
+  group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+)
+
+# Basic CDF plot for a single biomarker without groups
+  cdf_plot(
+  xvar = "biomarker",
+  data = data,
+  y.int = 10,
+  xlim = c(30, 70),
+  xvar.display = "Biomarker Level"
+)
+# CDF plot for a biomarker with groups
+cdf_plot(
+  xvar = "biomarker",
+  data = data,
+  y.int = 10,
+  xlim = c(30, 70),
+  xvar.display = "Biomarker Level",
+  group = "group"
+)
+}

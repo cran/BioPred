@@ -43,3 +43,36 @@ A list containing statistical summaries, selected cutoff statistics, selected cu
 \description{
 This function conducts fixed cutoff analysis for individual biomarker associated with continuous outcome variables.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  outcome = rnorm(100, mean = 10, sd = 5),
+  biomarker = rnorm(100, mean = 0, sd = 1)
+)
+
+# Perform fixed cutoff analysis using the "t.test" method with '>' direction
+fixcut_con(
+  yvar = "outcome",
+  xvar = "biomarker",
+  dir = ">",
+  cutoffs = seq(-2, 2, by = 0.5),
+  data = data,
+  method = "t.test",
+  yvar.display = "Continuous Outcome",
+  xvar.display = "Biomarker Level",
+  vert.x = TRUE
+)
+
+# Perform fixed cutoff analysis with '<=' direction
+fixcut_con(
+  yvar = "outcome",
+  xvar = "biomarker",
+  dir = "<=",
+  cutoffs = c(-1, 0, 1),
+  data = data,
+  method = "t.test",
+  yvar.display = "Continuous Outcome",
+  xvar.display = "Biomarker Level",
+  vert.x = FALSE
+)
+}

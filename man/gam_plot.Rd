@@ -72,3 +72,49 @@ A list containing p-table, s-table, GAM summary, GAM check, and the plot.
 Generates a generalized additive model (GAM) plot for exploring the relationship between a response
 variable and a biomarker.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  response = rnorm(100),
+  biomarker = rnorm(100, mean = 50, sd = 10),
+  censor = sample(c(0, 1), 100, replace = TRUE),
+  age = rnorm(100, mean = 60, sd = 10),
+  group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+)
+
+# Generate a GAM plot for a continuous response variable
+gam_plot(
+  yvar = "response",
+  xvar = "biomarker",
+  type = "c",
+  data = data,
+  xvars.adj = "age",
+  sxvars.adj = NULL,
+  k = 5,
+  pred.type = "iterms",
+  title = "GAM Plot of Biomarker and Response"
+)
+
+# Generate a GAM plot for survival analysis
+gam_plot(
+  yvar = "response",
+  censorvar = "censor",
+  xvar = "biomarker",
+  type = "s",
+  data = data,
+  k = 5,
+  title = "GAM Survival Plot for Biomarker"
+)
+
+# Generate a GAM plot for a binary response variable
+data$binary_response <- as.numeric(data$response > 0)
+gam_plot(
+  yvar = "binary_response",
+  xvar = "biomarker",
+  type = "b",
+  data = data,
+  k = 5,
+  pred.type = "response",
+  title = "GAM Plot for Binary Response"
+)
+}

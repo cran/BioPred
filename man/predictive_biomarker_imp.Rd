@@ -15,3 +15,31 @@ A barplot showing the biomarker importance.
 \description{
 This function calculates and plots the importance of biomarkers in a trained XGBoostSub_con, XGBoostSub_bin or XGBoostSub_sur model.
 }
+\examples{
+X_data <- matrix(rnorm(100 * 10), ncol = 10)  # 100 samples with 10 features
+y_data <- rnorm(100)  # continuous outcome variable
+trt <- sample(c(1, -1), 100, replace = TRUE)  # treatment indicator (1 or -1)
+pi <- runif(100, min = 0.3, max = 0.7)  # propensity scores between 0 and 1
+
+# Define XGBoost parameters
+params <- list(
+  max_depth = 3,
+  eta = 0.1,
+  subsample = 0.8,
+  colsample_bytree = 0.8
+)
+
+# Train the model using A-learning loss
+model_A <- XGBoostSub_con(
+  X_data = X_data,
+  y_data = y_data,
+  trt = trt,
+  pi = pi,
+  Loss_type = "A_learning",
+  params = params,
+  nrounds = 5,
+  disable_default_eval_metric = 1,
+  verbose = TRUE
+)
+biomarker_imp=predictive_biomarker_imp(model_A)
+}

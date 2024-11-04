@@ -47,3 +47,49 @@ A list containing statistical summaries, selected cutoff statistics, selected cu
 \description{
 This function conducts fixed cutoff analysis for individual biomarker associated with binary outcome variables.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  outcome = sample(c(0, 1), 100, replace = TRUE),
+  biomarker = rnorm(100, mean = 0, sd = 1)
+)
+
+# Perform fixed cutoff analysis using the "Fisher" method for a biomarker
+fixcut_bin(
+  yvar = "outcome",
+  xvar = "biomarker",
+  dir = ">",
+  cutoffs = seq(-2, 2, by = 0.5),
+  data = data,
+  method = "Fisher",
+  yvar.display = "Binary Outcome",
+  xvar.display = "Biomarker Level",
+  vert.x = TRUE
+)
+
+# Perform fixed cutoff analysis using the "Youden" method
+fixcut_bin(
+  yvar = "outcome",
+  xvar = "biomarker",
+  dir = "<",
+  cutoffs = seq(-2, 2, by = 0.5),
+  data = data,
+  method = "Youden",
+  yvar.display = "Binary Outcome",
+  xvar.display = "Biomarker Level",
+  vert.x = FALSE
+)
+
+# Perform fixed cutoff analysis using "Accuracy" method with different direction
+fixcut_bin(
+  yvar = "outcome",
+  xvar = "biomarker",
+  dir = ">=",
+  cutoffs = c(-1, 0, 1),
+  data = data,
+  method = "Accuracy",
+  yvar.display = "Binary Outcome",
+  xvar.display = "Biomarker Level",
+  vert.x = TRUE
+)
+}

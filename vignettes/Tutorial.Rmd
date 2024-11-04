@@ -1,6 +1,6 @@
 ---
 title: "BioPred Package Tutorial"
-author: "Zihuan Liu, 06/2024"
+author: "Zihuan Liu, 11/2024"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{BioPred Package Tutorial}
@@ -55,7 +55,7 @@ The tutorial_data dataset contains the following columns:
 - **x1** to **x10**: Biomarker variables.
 - **y.con**: A continuous outcome variable.
 - **y.bin**: A binary outcome variable (0 or 1).
-- **y.month**: Time in months, used for survival analysis.
+- **y.time**: Time in months, used for survival analysis.
 - **y.event**: Event indicator (0 for censoring, 1 for event occurrence).
 - **subgroup_label**: Ground truth of subgroup label. In real-world scenarios, this information is typically unavailable.
 - **treatment**: Treatment indicator (0 for control, 1 for treatment).

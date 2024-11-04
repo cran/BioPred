@@ -65,3 +65,50 @@ A list containing the p-value table, summarized p-value table, s-value table, su
 \description{
 Computes and plots the contrasts between treatment and control group based on a GAM for exploring the relationship be-tween treatment benefit and biomarker.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  response = rnorm(100),
+  biomarker = rnorm(100, mean = 50, sd = 10),
+  censor = sample(c(0, 1), 100, replace = TRUE),
+  treatment = sample(c(0, 1), 100, replace = TRUE),
+  age = rnorm(100, mean = 60, sd = 10),
+  group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+)
+
+# Generate a GAM contrast plot for a continuous response variable
+gam_ctr_plot(
+  yvar = "response",
+  xvar = "biomarker",
+  trtvar = "treatment",
+  type = "c",
+  data = data,
+  xvars.adj = "age",
+  k = 5,
+  title = "GAM Contrast Plot for Treatment vs. Control"
+)
+
+# Generate a GAM contrast plot for survival analysis
+gam_ctr_plot(
+  yvar = "response",
+  censorvar = "censor",
+  xvar = "biomarker",
+  trtvar = "treatment",
+  type = "s",
+  data = data,
+  k = 5,
+  title = "GAM Contrast Plot for Survival Data"
+)
+
+# Generate a GAM contrast plot for a binary response variable
+data$binary_response <- as.numeric(data$response > 0)
+gam_ctr_plot(
+  yvar = "binary_response",
+  xvar = "biomarker",
+  trtvar = "treatment",
+  type = "b",
+  data = data,
+  k = 5,
+  title = "GAM Contrast Plot for Binary Outcome"
+)
+}

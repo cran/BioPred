@@ -35,3 +35,31 @@ ROC plots for different biomarkers associated with binary outcomes.
 \description{
 Generates ROC plots for different biomarkers associated with binary outcomes.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  outcome = sample(c(0, 1), 100, replace = TRUE),
+  biomarker1 = rnorm(100, mean = 0, sd = 1),
+  biomarker2 = rnorm(100, mean = 5, sd = 2)
+)
+
+# Generate ROC plot for a single biomarker with auto direction
+roc_bin_plot(
+  yvar = "outcome",
+  xvars = "biomarker1",
+  dirs = "auto",
+  data = data,
+  yvar.display = "Binary Outcome",
+  xvars.display = "Biomarker 1"
+)
+
+# Generate ROC plots for multiple biomarkers with specified directions
+roc_bin_plot(
+  yvar = "outcome",
+  xvars = c("biomarker1", "biomarker2"),
+  dirs = c("auto", "<"),
+  data = data,
+  yvar.display = "Binary Outcome",
+  xvars.display = c("Biomarker 1", "Biomarker 2")
+)
+}

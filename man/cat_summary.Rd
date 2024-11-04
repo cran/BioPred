@@ -35,3 +35,22 @@ A list containing the contingency table, frequency table, and percentage table.
 \description{
 This function provides a summary of categorical variables in a dataset.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  outcome = sample(c("A", "B", "C"), 100, replace = TRUE),  # categorical outcome
+  group1 = sample(c("Male", "Female"), 100, replace = TRUE),  # group variable 1
+  group2 = sample(c("Young", "Old"), 100, replace = TRUE)  # group variable 2
+)
+
+# Summarize categorical outcome by two grouping variables
+cat_summary(
+  yvar = "outcome",
+  yname = c("A", "B", "C"),  # ordered categories for outcome
+  xvars = c("group1", "group2"),
+  xname.list = list(c("Male", "Female"), c("Young", "Old")),
+  data = data,
+  yvar.display = "Outcome Category",
+  xvars.display = c("Gender", "Age Group")
+)
+}

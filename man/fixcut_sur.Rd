@@ -48,3 +48,24 @@ A list containing statistical summaries, selected cutoff statistics, selected cu
 \description{
 This function conducts fixed cutoff analysis for Individual Biomarker Associated with survival outcome variables.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  time = rexp(100, rate = 0.1),  # survival time
+  status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+  biomarker = rnorm(100, mean = 0, sd = 1)  # biomarker levels
+)
+
+fixcut_sur(
+  yvar = "time",
+  censorvar = "status",
+  xvar = "biomarker",
+  dir = "<=",
+  cutoffs = c(-1, 0, 1),
+  data = data,
+  method = "logrank",
+  yvar.display = "Survival Time",
+  xvar.display = "Biomarker Level",
+  vert.x = FALSE
+)
+}

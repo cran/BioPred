@@ -36,3 +36,29 @@ A list containing correlation coefficients, scatter plot, slope, and intercept.
 Generates a scatter plot for exploring the relationship between a continuous response variable
 and a biomarker variable.
 }
+\examples{
+data <- data.frame(
+  outcome = rnorm(100, mean = 10, sd = 2),
+  biomarker = rnorm(100, mean = 0, sd = 1)
+)
+
+# Generate a scatter plot with default axis breaks
+scat_cont_plot(
+  yvar = "outcome",
+  xvar = "biomarker",
+  data = data,
+  yvar.display = "Continuous Outcome",
+  xvar.display = "Biomarker Level"
+)
+
+# Generate a scatter plot with specified axis breaks
+scat_cont_plot(
+  yvar = "outcome",
+  xvar = "biomarker",
+  data = data,
+  ybreaks = seq(5, 15, by = 1),
+  xbreaks = seq(-2, 2, by = 0.5),
+  yvar.display = "Continuous Outcome",
+  xvar.display = "Biomarker Level"
+)
+}

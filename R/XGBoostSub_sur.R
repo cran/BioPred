@@ -19,6 +19,50 @@
 #' This function requires the 'xgboost' library. Make sure to install and load the 'xgboost' library before using this function.
 #' @import xgboost
 #' @export
+#' @examples
+#' X_data <- matrix(rnorm(100 * 10), ncol = 10)  # 100 samples with 10 features
+#' y_data <- rexp(100, rate = 0.1)  # survival times, simulated as exponential
+#' trt <- sample(c(1, -1), 100, replace = TRUE)  # treatment indicator (1 or -1)
+#' pi <- runif(100, min = 0.3, max = 0.7)  # propensity scores between 0 and 1
+#' censor <- rbinom(100, 1, 0.7)  # censoring indicator (1 = censored, 0 = observed)
+#'
+#' # Define XGBoost parameters
+#' params <- list(
+#'   max_depth = 3,
+#'   eta = 0.1,
+#'   subsample = 0.8,
+#'   colsample_bytree = 0.8
+#' )
+#'
+#' # Train the model using A-learning loss
+#' model_A <- XGBoostSub_sur(
+#'   X_data = X_data,
+#'   y_data = y_data,
+#'   trt = trt,
+#'   pi = pi,
+#'   censor = censor,
+#'   Loss_type = "A_learning",
+#'   params = params,
+#'   nrounds = 5,
+#'   disable_default_eval_metric = 1,
+#'   verbose = TRUE
+#' )
+#'
+#' # Train the model using Weight-learning loss
+#' model_W <- XGBoostSub_sur(
+#'   X_data = X_data,
+#'   y_data = y_data,
+#'   trt = trt,
+#'   pi = pi,
+#'   censor = censor,
+#'   Loss_type = "Weight_learning",
+#'   params = params,
+#'   nrounds = 5,
+#'   disable_default_eval_metric = 1,
+#'   verbose = TRUE
+#' )
+#'
+
 XGBoostSub_sur <- function(X_data, y_data, trt, pi,censor, Loss_type = "Weight_learning", params = list(), nrounds = 50, disable_default_eval_metric = 1, verbose = TRUE) {
 
   risk_set_matrix <- function(time_to_event) {

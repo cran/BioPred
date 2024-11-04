@@ -29,3 +29,31 @@ A table containing the AUC values for each biomarker.
 Computes the area under the receiver operating characteristic (ROC) curve for Biomarkers Associated with Binary Outcomes,
 and returns the results as a table.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  outcome = sample(c(0, 1), 100, replace = TRUE),
+  biomarker1 = rnorm(100, mean = 0, sd = 1),
+  biomarker2 = rnorm(100, mean = 5, sd = 2)
+)
+
+# Compute AUC for a single biomarker with auto direction
+roc_bin(
+  yvar = "outcome",
+  xvars = "biomarker1",
+  dirs = "auto",
+  data = data,
+  yvar.display = "Binary Outcome",
+  xvars.display = "Biomarker 1"
+)
+
+# Compute AUC for multiple biomarkers with specified directions
+roc_bin(
+  yvar = "outcome",
+  xvars = c("biomarker1", "biomarker2"),
+  dirs = c("auto", "<"),
+  data = data,
+  yvar.display = "Binary Outcome",
+  xvars.display = c("Biomarker 1", "Biomarker 2")
+)
+}

@@ -41,3 +41,48 @@ A list containing subgroup performance results including logrank p-value, median
 \description{
 This function evaluates subgroup performance based on different types of response variables.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  survival_time = rexp(100, rate = 0.1),  # survival time
+  status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+  group = sample(c("Low", "Medium", "High"), 100, replace = TRUE),  # subgroup variable
+  covariate = rnorm(100, mean = 50, sd = 10)  # an additional covariate
+)
+
+# Perform subgroup performance evaluation for survival analysis
+subgrp_perf(
+  yvar = "survival_time",
+  censorvar = "status",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  data = data,
+  type = "s",
+  yvar.display = "Survival Time",
+  grpvar.display = "Risk Group"
+)
+
+# Perform subgroup performance evaluation for continuous outcome
+data$continuous_outcome <- rnorm(100, mean = 10, sd = 5)
+subgrp_perf(
+  yvar = "continuous_outcome",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  data = data,
+  type = "c",
+  yvar.display = "Continuous Outcome",
+  grpvar.display = "Risk Group"
+)
+
+# Perform subgroup performance evaluation for binary outcome
+data$binary_outcome <- sample(c(0, 1), 100, replace = TRUE)
+subgrp_perf(
+  yvar = "binary_outcome",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  data = data,
+  type = "b",
+  yvar.display = "Binary Outcome",
+  grpvar.display = "Risk Group"
+)
+}

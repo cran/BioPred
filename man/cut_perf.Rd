@@ -44,3 +44,37 @@ A list containing various performance metrics and optionally, plots.
 \description{
 This function evaluates the performance of a predictive model at a selected cutoff point.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  survival_time = rexp(100, rate = 0.1),  # survival time
+  status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+  biomarker = rnorm(100, mean = 0, sd = 1),  # biomarker levels
+  covariate1 = rnorm(100, mean = 50, sd = 10)  # an additional covariate
+)
+# Perform cutoff performance evaluation for continuous outcome
+data$continuous_outcome <- rnorm(100, mean = 10, sd = 5)
+cut_perf(
+  yvar = "continuous_outcome",
+  xvar = "biomarker",
+  cutoff = 0.5,
+  dir = ">=",
+  data = data,
+  type = "c",
+  yvar.display = "Continuous Outcome",
+  xvar.display = "Biomarker Level"
+)
+
+# Perform cutoff performance evaluation for binary outcome
+data$binary_outcome <- sample(c(0, 1), 100, replace = TRUE)
+cut_perf(
+  yvar = "binary_outcome",
+  xvar = "biomarker",
+  cutoff = 0,
+  dir = "<=",
+  data = data,
+  type = "b",
+  yvar.display = "Binary Outcome",
+  xvar.display = "Biomarker Level"
+)
+}

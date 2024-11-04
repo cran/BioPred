@@ -75,6 +75,33 @@ isout <- function(x) {
 #' @return A barplot showing the biomarker importance.
 #' @import xgboost
 #' @export
+#' @examples
+#' X_data <- matrix(rnorm(100 * 10), ncol = 10)  # 100 samples with 10 features
+#' y_data <- rnorm(100)  # continuous outcome variable
+#' trt <- sample(c(1, -1), 100, replace = TRUE)  # treatment indicator (1 or -1)
+#' pi <- runif(100, min = 0.3, max = 0.7)  # propensity scores between 0 and 1
+#'
+#' # Define XGBoost parameters
+#' params <- list(
+#'   max_depth = 3,
+#'   eta = 0.1,
+#'   subsample = 0.8,
+#'   colsample_bytree = 0.8
+#' )
+#'
+#' # Train the model using A-learning loss
+#' model_A <- XGBoostSub_con(
+#'   X_data = X_data,
+#'   y_data = y_data,
+#'   trt = trt,
+#'   pi = pi,
+#'   Loss_type = "A_learning",
+#'   params = params,
+#'   nrounds = 5,
+#'   disable_default_eval_metric = 1,
+#'   verbose = TRUE
+#' )
+#' biomarker_imp=predictive_biomarker_imp(model_A)
 predictive_biomarker_imp <- function(model) {
   # Calculate feature importance
   importance <- xgb.importance(model = model)
@@ -107,6 +134,33 @@ predictive_biomarker_imp <- function(model) {
 #' @return A data frame containing each subject and assigned treatment (1 for treatment, 0 for control). If subgroup labels are provided, it also returns the prediction accuracy of the subgroup labels.
 #' @import xgboost
 #' @export
+#' @examples
+#' X_data <- matrix(rnorm(100 * 10), ncol = 10)  # 100 samples with 10 features
+#' y_data <- rnorm(100)  # continuous outcome variable
+#' trt <- sample(c(1, -1), 100, replace = TRUE)  # treatment indicator (1 or -1)
+#' pi <- runif(100, min = 0.3, max = 0.7)  # propensity scores between 0 and 1
+#'
+#' # Define XGBoost parameters
+#' params <- list(
+#'   max_depth = 3,
+#'   eta = 0.1,
+#'   subsample = 0.8,
+#'   colsample_bytree = 0.8
+#' )
+#'
+#' # Train the model using A-learning loss
+#' model_A <- XGBoostSub_con(
+#'   X_data = X_data,
+#'   y_data = y_data,
+#'   trt = trt,
+#'   pi = pi,
+#'   Loss_type = "A_learning",
+#'   params = params,
+#'   nrounds = 5,
+#'   disable_default_eval_metric = 1,
+#'   verbose = TRUE
+#' )
+#' subgroup_results=get_subgroup_results(model_A, X_data, subgroup_label=NULL, cutoff = 0.5)
 get_subgroup_results <- function(model, X_feature, subgroup_label = NULL, cutoff = 0.5) {
   # Convert data to xgb.DMatrix
   if (is.null(subgroup_label)) {
@@ -146,6 +200,30 @@ get_subgroup_results <- function(model, X_feature, subgroup_label = NULL, cutoff
 #' @return A ggplot object representing the CDF inverse plot.
 #' @import ggplot2
 #' @export
+#' @examples
+#' # Load a sample dataset
+#'   data <- data.frame(
+#'   biomarker = rnorm(100, mean = 50, sd = 10),
+#'   group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+#' )
+#'
+#' # Basic CDF plot for a single biomarker without groups
+#'   cdf_plot(
+#'   xvar = "biomarker",
+#'   data = data,
+#'   y.int = 10,
+#'   xlim = c(30, 70),
+#'   xvar.display = "Biomarker Level"
+#' )
+#' # CDF plot for a biomarker with groups
+#' cdf_plot(
+#'   xvar = "biomarker",
+#'   data = data,
+#'   y.int = 10,
+#'   xlim = c(30, 70),
+#'   xvar.display = "Biomarker Level",
+#'   group = "group"
+#' )
 cdf_plot = function(xvar, data, y.int=5, xlim=NULL, xvar.display=xvar, group=NULL){
    num=NULL
    if(is.null(group)||is.na(group)){
@@ -215,6 +293,33 @@ cdf_plot = function(xvar, data, y.int=5, xlim=NULL, xvar.display=xvar, group=NUL
 #' @return A table containing the AUC values for each biomarker.
 #' @import pROC
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   outcome = sample(c(0, 1), 100, replace = TRUE),
+#'   biomarker1 = rnorm(100, mean = 0, sd = 1),
+#'   biomarker2 = rnorm(100, mean = 5, sd = 2)
+#' )
+#'
+#' # Compute AUC for a single biomarker with auto direction
+#' roc_bin(
+#'   yvar = "outcome",
+#'   xvars = "biomarker1",
+#'   dirs = "auto",
+#'   data = data,
+#'   yvar.display = "Binary Outcome",
+#'   xvars.display = "Biomarker 1"
+#' )
+#'
+#' # Compute AUC for multiple biomarkers with specified directions
+#' roc_bin(
+#'   yvar = "outcome",
+#'   xvars = c("biomarker1", "biomarker2"),
+#'   dirs = c("auto", "<"),
+#'   data = data,
+#'   yvar.display = "Binary Outcome",
+#'   xvars.display = c("Biomarker 1", "Biomarker 2")
+#' )
 roc_bin = function(yvar, xvars, dirs, data, yvar.display=yvar, xvars.display=xvars){
 
   if(!all(data[,yvar]%in%c(0,1,NA)) | !all(c(0,1)%in%data[,yvar])) stop("Response needs to be 0/1.")
@@ -267,6 +372,33 @@ roc_bin = function(yvar, xvars, dirs, data, yvar.display=yvar, xvars.display=xva
 #' @return ROC plots for different biomarkers associated with binary outcomes.
 #' @import pROC
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   outcome = sample(c(0, 1), 100, replace = TRUE),
+#'   biomarker1 = rnorm(100, mean = 0, sd = 1),
+#'   biomarker2 = rnorm(100, mean = 5, sd = 2)
+#' )
+#'
+#' # Generate ROC plot for a single biomarker with auto direction
+#' roc_bin_plot(
+#'   yvar = "outcome",
+#'   xvars = "biomarker1",
+#'   dirs = "auto",
+#'   data = data,
+#'   yvar.display = "Binary Outcome",
+#'   xvars.display = "Biomarker 1"
+#' )
+#'
+#' # Generate ROC plots for multiple biomarkers with specified directions
+#' roc_bin_plot(
+#'   yvar = "outcome",
+#'   xvars = c("biomarker1", "biomarker2"),
+#'   dirs = c("auto", "<"),
+#'   data = data,
+#'   yvar.display = "Binary Outcome",
+#'   xvars.display = c("Biomarker 1", "Biomarker 2")
+#' )
 roc_bin_plot = function(yvar, xvars, dirs, data, yvar.display=yvar, xvars.display=xvars){
 
   if(!all(data[,yvar]%in%c(0,1,NA)) | !all(c(0,1)%in%data[,yvar])) stop("Response needs to be 0/1.")
@@ -309,6 +441,31 @@ roc_bin_plot = function(yvar, xvars, dirs, data, yvar.display=yvar, xvars.displa
 #' @param xvar.display Display name for the biomarker variable.
 #' @return A list containing correlation coefficients, scatter plot, slope, and intercept.
 #' @export
+#' @examples
+#' data <- data.frame(
+#'   outcome = rnorm(100, mean = 10, sd = 2),
+#'   biomarker = rnorm(100, mean = 0, sd = 1)
+#' )
+#'
+#' # Generate a scatter plot with default axis breaks
+#' scat_cont_plot(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   data = data,
+#'   yvar.display = "Continuous Outcome",
+#'   xvar.display = "Biomarker Level"
+#' )
+#'
+#' # Generate a scatter plot with specified axis breaks
+#' scat_cont_plot(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   data = data,
+#'   ybreaks = seq(5, 15, by = 1),
+#'   xbreaks = seq(-2, 2, by = 0.5),
+#'   yvar.display = "Continuous Outcome",
+#'   xvar.display = "Biomarker Level"
+#' )
 scat_cont_plot = function(yvar, xvar, data, ybreaks=NULL, xbreaks=NULL, yvar.display=yvar, xvar.display=xvar){
   data = data[,c(yvar,xvar)]
   data = data[stats::complete.cases(data),]
@@ -385,6 +542,51 @@ scat_cont_plot = function(yvar, xvar, data, ybreaks=NULL, xbreaks=NULL, yvar.dis
 #' @return A list containing p-table, s-table, GAM summary, GAM check, and the plot.
 #' @import mgcv
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   response = rnorm(100),
+#'   biomarker = rnorm(100, mean = 50, sd = 10),
+#'   censor = sample(c(0, 1), 100, replace = TRUE),
+#'   age = rnorm(100, mean = 60, sd = 10),
+#'   group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+#' )
+#'
+#' # Generate a GAM plot for a continuous response variable
+#' gam_plot(
+#'   yvar = "response",
+#'   xvar = "biomarker",
+#'   type = "c",
+#'   data = data,
+#'   xvars.adj = "age",
+#'   sxvars.adj = NULL,
+#'   k = 5,
+#'   pred.type = "iterms",
+#'   title = "GAM Plot of Biomarker and Response"
+#' )
+#'
+#' # Generate a GAM plot for survival analysis
+#' gam_plot(
+#'   yvar = "response",
+#'   censorvar = "censor",
+#'   xvar = "biomarker",
+#'   type = "s",
+#'   data = data,
+#'   k = 5,
+#'   title = "GAM Survival Plot for Biomarker"
+#' )
+#'
+#' # Generate a GAM plot for a binary response variable
+#' data$binary_response <- as.numeric(data$response > 0)
+#' gam_plot(
+#'   yvar = "binary_response",
+#'   xvar = "biomarker",
+#'   type = "b",
+#'   data = data,
+#'   k = 5,
+#'   pred.type = "response",
+#'   title = "GAM Plot for Binary Response"
+#' )
 gam_plot = function(yvar, censorvar=NULL, xvar, xvars.adj=NULL, sxvars.adj=NULL, type, data, k,
                     pred.type="iterms", link.scale=TRUE, title="Trend Plot", ybreaks=NULL, xbreaks=NULL,
                     rugcol.var=NULL, add.points=FALSE, prt.sum=TRUE, prt.chk=FALSE, outlier.rm=FALSE, newdat=NULL){
@@ -599,6 +801,52 @@ gam_plot = function(yvar, censorvar=NULL, xvar, xvars.adj=NULL, sxvars.adj=NULL,
 #' @return A list containing the p-value table, summarized p-value table, s-value table, summarized s-value table, and the plot.
 #' @import mgcv
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   response = rnorm(100),
+#'   biomarker = rnorm(100, mean = 50, sd = 10),
+#'   censor = sample(c(0, 1), 100, replace = TRUE),
+#'   treatment = sample(c(0, 1), 100, replace = TRUE),
+#'   age = rnorm(100, mean = 60, sd = 10),
+#'   group = sample(c("Group A", "Group B"), 100, replace = TRUE)
+#' )
+#'
+#' # Generate a GAM contrast plot for a continuous response variable
+#' gam_ctr_plot(
+#'   yvar = "response",
+#'   xvar = "biomarker",
+#'   trtvar = "treatment",
+#'   type = "c",
+#'   data = data,
+#'   xvars.adj = "age",
+#'   k = 5,
+#'   title = "GAM Contrast Plot for Treatment vs. Control"
+#' )
+#'
+#' # Generate a GAM contrast plot for survival analysis
+#' gam_ctr_plot(
+#'   yvar = "response",
+#'   censorvar = "censor",
+#'   xvar = "biomarker",
+#'   trtvar = "treatment",
+#'   type = "s",
+#'   data = data,
+#'   k = 5,
+#'   title = "GAM Contrast Plot for Survival Data"
+#' )
+#'
+#' # Generate a GAM contrast plot for a binary response variable
+#' data$binary_response <- as.numeric(data$response > 0)
+#' gam_ctr_plot(
+#'   yvar = "binary_response",
+#'   xvar = "biomarker",
+#'   trtvar = "treatment",
+#'   type = "b",
+#'   data = data,
+#'   k = 5,
+#'   title = "GAM Contrast Plot for Binary Outcome"
+#' )
 gam_ctr_plot = function(yvar, censorvar=NULL, xvar, xvars.adj=NULL, sxvars.adj=NULL, trtvar=NULL, type,
                         data, k, title="Group Contrast", ybreaks=NULL, xbreaks=NULL, rugcol.var=NULL,
                         link.scale=TRUE, prt.sum=TRUE, prt.chk=FALSE, outlier.rm=FALSE){
@@ -791,6 +1039,51 @@ gam_ctr_plot = function(yvar, censorvar=NULL, xvar, xvars.adj=NULL, sxvars.adj=N
 #'         and a ggplot object for visualization.
 #' @import PropCIs
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   outcome = sample(c(0, 1), 100, replace = TRUE),
+#'   biomarker = rnorm(100, mean = 0, sd = 1)
+#' )
+#'
+#' # Perform fixed cutoff analysis using the "Fisher" method for a biomarker
+#' fixcut_bin(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   dir = ">",
+#'   cutoffs = seq(-2, 2, by = 0.5),
+#'   data = data,
+#'   method = "Fisher",
+#'   yvar.display = "Binary Outcome",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = TRUE
+#' )
+#'
+#' # Perform fixed cutoff analysis using the "Youden" method
+#' fixcut_bin(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   dir = "<",
+#'   cutoffs = seq(-2, 2, by = 0.5),
+#'   data = data,
+#'   method = "Youden",
+#'   yvar.display = "Binary Outcome",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = FALSE
+#' )
+#'
+#' # Perform fixed cutoff analysis using "Accuracy" method with different direction
+#' fixcut_bin(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   dir = ">=",
+#'   cutoffs = c(-1, 0, 1),
+#'   data = data,
+#'   method = "Accuracy",
+#'   yvar.display = "Binary Outcome",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = TRUE
+#' )
 fixcut_bin = function(yvar, xvar, dir, cutoffs, data, method="Fisher", yvar.display=yvar, xvar.display=xvar, vert.x=FALSE){
   Cutoff=NULL
   Value=NULL
@@ -983,6 +1276,38 @@ fixcut_bin = function(yvar, xvar, dir, cutoffs, data, method="Fisher", yvar.disp
 #' @return A list containing statistical summaries, selected cutoff statistics, selected cutoff value, group statistics,
 #'         and a ggplot object for visualization.
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   outcome = rnorm(100, mean = 10, sd = 5),
+#'   biomarker = rnorm(100, mean = 0, sd = 1)
+#' )
+#'
+#' # Perform fixed cutoff analysis using the "t.test" method with '>' direction
+#' fixcut_con(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   dir = ">",
+#'   cutoffs = seq(-2, 2, by = 0.5),
+#'   data = data,
+#'   method = "t.test",
+#'   yvar.display = "Continuous Outcome",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = TRUE
+#' )
+#'
+#' # Perform fixed cutoff analysis with '<=' direction
+#' fixcut_con(
+#'   yvar = "outcome",
+#'   xvar = "biomarker",
+#'   dir = "<=",
+#'   cutoffs = c(-1, 0, 1),
+#'   data = data,
+#'   method = "t.test",
+#'   yvar.display = "Continuous Outcome",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = FALSE
+#' )
 fixcut_con <- function(yvar, xvar, dir, cutoffs, data, method="t.test", yvar.display=yvar, xvar.display=xvar, vert.x=FALSE) {
   Cutoff <- NULL
   Mean <- NULL
@@ -1191,6 +1516,26 @@ fixcut_con <- function(yvar, xvar, dir, cutoffs, data, method="t.test", yvar.dis
 #' @return A list containing statistical summaries, selected cutoff statistics, selected cutoff value, group statistics,
 #'         and a ggplot object for visualization.
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   time = rexp(100, rate = 0.1),  # survival time
+#'   status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+#'   biomarker = rnorm(100, mean = 0, sd = 1)  # biomarker levels
+#' )
+#'
+#' fixcut_sur(
+#'   yvar = "time",
+#'   censorvar = "status",
+#'   xvar = "biomarker",
+#'   dir = "<=",
+#'   cutoffs = c(-1, 0, 1),
+#'   data = data,
+#'   method = "logrank",
+#'   yvar.display = "Survival Time",
+#'   xvar.display = "Biomarker Level",
+#'   vert.x = FALSE
+#' )
 fixcut_sur = function(yvar, censorvar, xvar, dir, cutoffs, data, method="logrank", yvar.display=yvar, xvar.display=xvar, vert.x=FALSE){
   Cutoff=NULL
   HR.Lo=NULL
@@ -1366,6 +1711,40 @@ fixcut_sur = function(yvar, censorvar, xvar, dir, cutoffs, data, method="logrank
 #' @importFrom stats confint
 #' @importFrom stats glm
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   survival_time = rexp(100, rate = 0.1),  # survival time
+#'   status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+#'   biomarker = rnorm(100, mean = 0, sd = 1),  # biomarker levels
+#'   covariate1 = rnorm(100, mean = 50, sd = 10)  # an additional covariate
+#' )
+#' # Perform cutoff performance evaluation for continuous outcome
+#' data$continuous_outcome <- rnorm(100, mean = 10, sd = 5)
+#' cut_perf(
+#'   yvar = "continuous_outcome",
+#'   xvar = "biomarker",
+#'   cutoff = 0.5,
+#'   dir = ">=",
+#'   data = data,
+#'   type = "c",
+#'   yvar.display = "Continuous Outcome",
+#'   xvar.display = "Biomarker Level"
+#' )
+#'
+#' # Perform cutoff performance evaluation for binary outcome
+#' data$binary_outcome <- sample(c(0, 1), 100, replace = TRUE)
+#' cut_perf(
+#'   yvar = "binary_outcome",
+#'   xvar = "biomarker",
+#'   cutoff = 0,
+#'   dir = "<=",
+#'   data = data,
+#'   type = "b",
+#'   yvar.display = "Binary Outcome",
+#'   xvar.display = "Biomarker Level"
+#' )
+
 cut_perf = function(yvar, censorvar=NULL, xvar, cutoff, dir, xvars.adj=NULL, data, type, yvar.display=yvar, xvar.display=xvar){
   Group=NULL
 
@@ -1787,6 +2166,25 @@ cut_perf = function(yvar, censorvar=NULL, xvar, cutoff, dir, xvars.adj=NULL, dat
 #' @param xvars.display Display name for xvars.
 #' @return A list containing the contingency table, frequency table, and percentage table.
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   outcome = sample(c("A", "B", "C"), 100, replace = TRUE),  # categorical outcome
+#'   group1 = sample(c("Male", "Female"), 100, replace = TRUE),  # group variable 1
+#'   group2 = sample(c("Young", "Old"), 100, replace = TRUE)  # group variable 2
+#' )
+#'
+#' # Summarize categorical outcome by two grouping variables
+#' cat_summary(
+#'   yvar = "outcome",
+#'   yname = c("A", "B", "C"),  # ordered categories for outcome
+#'   xvars = c("group1", "group2"),
+#'   xname.list = list(c("Male", "Female"), c("Young", "Old")),
+#'   data = data,
+#'   yvar.display = "Outcome Category",
+#'   xvars.display = c("Gender", "Age Group")
+#' )
+
 cat_summary = function(yvar, yname, xvars, xname.list, data, yvar.display=yvar, xvars.display=xvars){
   #yvar: name of the variable for summary
   #yname: a vector of ordered y values
@@ -1852,6 +2250,60 @@ cat_summary = function(yvar, yname, xvars, xname.list, data, yvar.display=yvar, 
 #' @return A list containing the comparison results, group results, and possibly a plot.
 #' @importFrom car Anova
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   response = rnorm(100, mean = 10, sd = 5),  # continuous response
+#'   survival_time = rexp(100, rate = 0.1),  # survival time
+#'   status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+#'   group = sample(c("Low", "Medium", "High"), 100, replace = TRUE),  # subgroup variable
+#'   treatment = sample(c("A", "B"), 100, replace = TRUE)  # treatment variable
+#' )
+#'
+#' # Subgroup performance evaluation for predictive cases - survival analysis
+#' subgrp_perf_pred(
+#'   yvar = "survival_time",
+#'   censorvar = "status",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   trtvar = "treatment",
+#'   trtname = c("A", "B"),
+#'   data = data,
+#'   type = "s",
+#'   yvar.display = "Survival Time",
+#'   grpvar.display = "Risk Group",
+#'   trtvar.display = "Treatment"
+#' )
+#'
+#' # Subgroup performance evaluation for predictive cases - continuous outcome
+#' subgrp_perf_pred(
+#'   yvar = "response",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   trtvar = "treatment",
+#'   trtname = c("A", "B"),
+#'   data = data,
+#'   type = "c",
+#'   yvar.display = "Response",
+#'   grpvar.display = "Risk Group",
+#'   trtvar.display = "Treatment"
+#' )
+#'
+#' # Subgroup performance evaluation for predictive cases - binary outcome
+#' data$binary_response <- sample(c(0, 1), 100, replace = TRUE)
+#' subgrp_perf_pred(
+#'   yvar = "binary_response",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   trtvar = "treatment",
+#'   trtname = c("A", "B"),
+#'   data = data,
+#'   type = "b",
+#'   yvar.display = "Binary Response",
+#'   grpvar.display = "Risk Group",
+#'   trtvar.display = "Treatment"
+#' )
+
 subgrp_perf_pred = function(yvar, censorvar=NULL, grpvar, grpname, trtvar, trtname, xvars.adj=NULL, data,
                             type, yvar.display=yvar, grpvar.display=grpvar, trtvar.display=trtvar){
   Group=NULL
@@ -2121,6 +2573,51 @@ subgrp_perf_pred = function(yvar, censorvar=NULL, grpvar, grpname, trtvar, trtna
 #' @importFrom onewaytests welch.test
 #' @importFrom car Anova
 #' @export
+#' @examples
+#' # Load a sample dataset
+#' data <- data.frame(
+#'   survival_time = rexp(100, rate = 0.1),  # survival time
+#'   status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+#'   group = sample(c("Low", "Medium", "High"), 100, replace = TRUE),  # subgroup variable
+#'   covariate = rnorm(100, mean = 50, sd = 10)  # an additional covariate
+#' )
+#'
+#' # Perform subgroup performance evaluation for survival analysis
+#' subgrp_perf(
+#'   yvar = "survival_time",
+#'   censorvar = "status",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   data = data,
+#'   type = "s",
+#'   yvar.display = "Survival Time",
+#'   grpvar.display = "Risk Group"
+#' )
+#'
+#' # Perform subgroup performance evaluation for continuous outcome
+#' data$continuous_outcome <- rnorm(100, mean = 10, sd = 5)
+#' subgrp_perf(
+#'   yvar = "continuous_outcome",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   data = data,
+#'   type = "c",
+#'   yvar.display = "Continuous Outcome",
+#'   grpvar.display = "Risk Group"
+#' )
+#'
+#' # Perform subgroup performance evaluation for binary outcome
+#' data$binary_outcome <- sample(c(0, 1), 100, replace = TRUE)
+#' subgrp_perf(
+#'   yvar = "binary_outcome",
+#'   grpvar = "group",
+#'   grpname = c("Low", "Medium", "High"),
+#'   data = data,
+#'   type = "b",
+#'   yvar.display = "Binary Outcome",
+#'   grpvar.display = "Risk Group"
+#' )
+
 subgrp_perf = function(yvar, censorvar=NULL, grpvar, grpname, xvars.adj=NULL, data, type, yvar.display=yvar, grpvar.display=grpvar){
   Group=NULL
   y=NULL

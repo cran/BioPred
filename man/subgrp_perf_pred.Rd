@@ -50,3 +50,57 @@ A list containing the comparison results, group results, and possibly a plot.
 \description{
 This function evaluates the performance of subgroups based on different types of response variables in predictive cases.
 }
+\examples{
+# Load a sample dataset
+data <- data.frame(
+  response = rnorm(100, mean = 10, sd = 5),  # continuous response
+  survival_time = rexp(100, rate = 0.1),  # survival time
+  status = sample(c(0, 1), 100, replace = TRUE),  # censoring status
+  group = sample(c("Low", "Medium", "High"), 100, replace = TRUE),  # subgroup variable
+  treatment = sample(c("A", "B"), 100, replace = TRUE)  # treatment variable
+)
+
+# Subgroup performance evaluation for predictive cases - survival analysis
+subgrp_perf_pred(
+  yvar = "survival_time",
+  censorvar = "status",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  trtvar = "treatment",
+  trtname = c("A", "B"),
+  data = data,
+  type = "s",
+  yvar.display = "Survival Time",
+  grpvar.display = "Risk Group",
+  trtvar.display = "Treatment"
+)
+
+# Subgroup performance evaluation for predictive cases - continuous outcome
+subgrp_perf_pred(
+  yvar = "response",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  trtvar = "treatment",
+  trtname = c("A", "B"),
+  data = data,
+  type = "c",
+  yvar.display = "Response",
+  grpvar.display = "Risk Group",
+  trtvar.display = "Treatment"
+)
+
+# Subgroup performance evaluation for predictive cases - binary outcome
+data$binary_response <- sample(c(0, 1), 100, replace = TRUE)
+subgrp_perf_pred(
+  yvar = "binary_response",
+  grpvar = "group",
+  grpname = c("Low", "Medium", "High"),
+  trtvar = "treatment",
+  trtname = c("A", "B"),
+  data = data,
+  type = "b",
+  yvar.display = "Binary Response",
+  grpvar.display = "Risk Group",
+  trtvar.display = "Treatment"
+)
+}
